@@ -74,6 +74,9 @@
     </main>
 
     <script>
+        let loginAttemptsChart; // Store the login attempts chart instance
+        let blockedIpsChart;    // Store the blocked IPs chart instance
+
         // Fetch and update login attempts every 5 seconds
         function fetchLoginAttempts() {
             $.get('/api/login_attempts', function(data) {
@@ -82,7 +85,7 @@
                     html += `<tr>
                         <td>${attempt.username}</td>
                         <td>${attempt.password}</td>
-                        <td>${attempt.src_ip}</td>
+                        <td>${attempt.ip_address}</td>
                         <td>${attempt.timestamp}</td>
                         <td>${attempt.status}</td>
                     </tr>`;
@@ -105,40 +108,58 @@
             });
         }
 
-        // Render Charts
-        function renderCharts() {
+        // Render or update the Login Attempts chart
+        function renderLoginAttemptsChart() {
             $.get('/api/login_attempts', function(data) {
                 let times = data.map(attempt => attempt.timestamp);  // Timestamps
                 let attempts = data.map(attempt => attempt.username); // Usernames
 
-                const loginAttemptsCtx = document.getElementById('loginAttemptsChart').getContext('2d');
-                new Chart(loginAttemptsCtx, {
+                const ctx = document.getElementById('loginAttemptsChart').getContext('2d');
+
+                // Destroy the existing chart instance if it exists
+                if (loginAttemptsChart) {
+                    loginAttemptsChart.destroy();
+                }
+
+                // Create a new chart instance
+                loginAttemptsChart = new Chart(ctx, {
                     type: 'line',
                     data: {
                         labels: times,
                         datasets: [{
                             label: 'Login Attempts',
-                            data: attempts,
+                            data: new Array(times.length).fill(1), // Dummy data for visualization
                             borderColor: '#00FF00',
                             backgroundColor: 'rgba(0, 255, 0, 0.2)',
                             borderWidth: 1
                         }]
                     },
                     options: {
+                        responsive: true,
                         scales: {
-                            x: { type: 'linear', position: 'bottom' },
+                            x: { type: 'category', position: 'bottom' },
                             y: { beginAtZero: true }
                         }
                     }
                 });
             });
+        }
 
+        // Render or update the Blocked IPs chart
+        function renderBlockedIpsChart() {
             $.get('/api/blocked_ips', function(data) {
                 let times = data.map(ip => ip.blocked_timestamp);  // Blocked times
                 let ips = data.map(ip => ip.ip_address); // IPs
 
-                const blockedIpsCtx = document.getElementById('blockedIpsChart').getContext('2d');
-                new Chart(blockedIpsCtx, {
+                const ctx = document.getElementById('blockedIpsChart').getContext('2d');
+
+                // Destroy the existing chart instance if it exists
+                if (blockedIpsChart) {
+                    blockedIpsChart.destroy();
+                }
+
+                // Create a new chart instance
+                blockedIpsChart = new Chart(ctx, {
                     type: 'bar',
                     data: {
                         labels: ips,
@@ -166,12 +187,15 @@
         $(document).ready(function() {
             fetchLoginAttempts();
             fetchBlockedIps();
-            renderCharts();
+            renderLoginAttemptsChart();
+            renderBlockedIpsChart();
 
-            // Refresh data every 5 seconds
+            // Refresh data and charts every 5 seconds
             setInterval(function() {
                 fetchLoginAttempts();
                 fetchBlockedIps();
+                renderLoginAttemptsChart();
+                renderBlockedIpsChart();
             }, 5000);
 
             // Export data to CSV

@@ -241,3 +241,27 @@
 2025-04-01 08:45:16,455 - Error sending alert: Unknown error in HTTP implementation: RuntimeError('Event loop is closed')
 2025-04-01 08:45:16,457 - 🔐 Login attempt [Username: fakeuser, Password: fakepassword] from IP 192.168.137.78
 2025-04-01 08:45:17,816 - HTTP Request: POST https://api.telegram.org/bot7731626441:AAFoUs4f7h_QeIexuccDh4ZeBI42CGMsiOo/sendMessage "HTTP/1.1 200 OK"
+2025-04-01 08:50:25,362 - 🔐 Login attempt [Username: testuser, Password: wrongpassword] from IP 192.168.1.100
+2025-04-01 08:50:26,358 - HTTP Request: POST https://api.telegram.org/bot7731626441:AAFoUs4f7h_QeIexuccDh4ZeBI42CGMsiOo/sendMessage "HTTP/1.1 200 OK"
+2025-04-01 08:50:27,366 - 🔐 Login attempt [Username: testuser, Password: wrongpassword] from IP 192.168.1.100
+2025-04-01 08:50:27,415 - Error sending alert: Unknown error in HTTP implementation: RuntimeError('Event loop is closed')
+2025-04-01 08:50:28,418 - 🔐 Login attempt [Username: testuser, Password: wrongpassword] from IP 192.168.1.100
+2025-04-01 08:50:29,913 - HTTP Request: POST https://api.telegram.org/bot7731626441:AAFoUs4f7h_QeIexuccDh4ZeBI42CGMsiOo/sendMessage "HTTP/1.1 200 OK"
+2025-04-01 08:52:34,052 - 🔐 Login attempt [Username: user1, Password: wrongpassword1] from IP 192.168.1.101
+2025-04-01 08:52:36,237 - HTTP Request: POST https://api.telegram.org/bot7731626441:AAFoUs4f7h_QeIexuccDh4ZeBI42CGMsiOo/sendMessage "HTTP/1.1 200 OK"
+2025-04-01 08:52:36,745 - 🔐 Login attempt [Username: user2, Password: wrongpassword2] from IP 192.168.1.102
+2025-04-01 08:52:36,779 - Error sending alert: Unknown error in HTTP implementation: RuntimeError('Event loop is closed')
+2025-04-01 08:52:37,281 - 🔐 Login attempt [Username: user3, Password: wrongpassword3] from IP 192.168.1.103
+2025-04-01 08:52:38,077 - HTTP Request: POST https://api.telegram.org/bot7731626441:AAFoUs4f7h_QeIexuccDh4ZeBI42CGMsiOo/sendMessage "HTTP/1.1 200 OK"
+2025-04-01 08:52:38,582 - 🔐 Login attempt [Username: user1, Password: wrongpassword1] from IP 192.168.1.101
+2025-04-01 08:52:38,613 - Error sending alert: Unknown error in HTTP implementation: RuntimeError('Event loop is closed')
+2025-04-01 08:52:39,114 - 🔐 Login attempt [Username: user2, Password: wrongpassword2] from IP 192.168.1.102
+2025-04-01 08:52:39,864 - HTTP Request: POST https://api.telegram.org/bot7731626441:AAFoUs4f7h_QeIexuccDh4ZeBI42CGMsiOo/sendMessage "HTTP/1.1 200 OK"
+2025-04-01 08:52:40,369 - 🔐 Login attempt [Username: user3, Password: wrongpassword3] from IP 192.168.1.103
+2025-04-01 08:52:40,395 - Error sending alert: Unknown error in HTTP implementation: RuntimeError('Event loop is closed')
+2025-04-01 08:52:40,896 - 🔐 Login attempt [Username: user1, Password: wrongpassword1] from IP 192.168.1.101
+2025-04-01 08:52:42,397 - HTTP Request: POST https://api.telegram.org/bot7731626441:AAFoUs4f7h_QeIexuccDh4ZeBI42CGMsiOo/sendMessage "HTTP/1.1 200 OK"
+2025-04-01 08:52:42,904 - 🔐 Login attempt [Username: user2, Password: wrongpassword2] from IP 192.168.1.102
+2025-04-01 08:52:43,603 - Error sending alert: Unknown error in HTTP implementation: RuntimeError('Event loop is closed')
+2025-04-01 08:52:44,105 - 🔐 Login attempt [Username: user3, Password: wrongpassword3] from IP 192.168.1.103
+2025-04-01 08:52:45,623 - HTTP Request: POST https://api.telegram.org/bot7731626441:AAFoUs4f7h_QeIexuccDh4ZeBI42CGMsiOo/sendMessage "HTTP/1.1 200 OK"
