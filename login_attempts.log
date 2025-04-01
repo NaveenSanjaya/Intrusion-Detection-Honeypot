@@ -1,0 +1,30 @@
+2025-04-01 06:33:00,965 - Login attempt [username: fakeuser, password: fakepassword] from 192.168.137.78
+2025-04-01 06:33:20,921 - Login attempt [username: fakeuser, password: fakepassword] from 192.168.137.78
+2025-04-01 06:34:35,404 - Login attempt [username: fakeuser, password: fakepassword] from 192.168.137.78
+2025-04-01 06:34:36,225 - HTTP Request: POST https://api.telegram.org/bot7731626441:AAFoUs4f7h_QeIexuccDh4ZeBI42CGMsiOo/sendMessage "HTTP/1.1 200 OK"
+2025-04-01 06:35:12,429 - Login attempt [username: fakeuser, password: fakepassword] from 192.168.137.78
+2025-04-01 06:35:13,348 - HTTP Request: POST https://api.telegram.org/bot7731626441:AAFoUs4f7h_QeIexuccDh4ZeBI42CGMsiOo/sendMessage "HTTP/1.1 200 OK"
+2025-04-01 06:35:21,538 - Login attempt [username: fakeuser, password: fakepassword] from 192.168.137.78
+2025-04-01 06:35:23,393 - HTTP Request: POST https://api.telegram.org/bot7731626441:AAFoUs4f7h_QeIexuccDh4ZeBI42CGMsiOo/sendMessage "HTTP/1.1 200 OK"
+2025-04-01 06:42:22,340 - Login attempt [username: fakeuser, password: fakepassword] from 192.168.137.78
+2025-04-01 06:42:41,258 - Login attempt [username: fakeuser, password: fakepassword] from 192.168.137.78
+2025-04-01 06:42:44,841 - Login attempt [username: fakeuser, password: fakepassword] from 192.168.137.78
+2025-04-01 06:42:47,167 - Login attempt [username: fakeuser, password: fakepassword] from 192.168.137.78
+2025-04-01 06:42:49,737 - Login attempt [username: fakeuser, password: fakepassword] from 192.168.137.78
+2025-04-01 06:42:54,280 - Login attempt [username: fakeuser, password: fakepassword] from 192.168.137.78
+2025-04-01 06:43:30,370 - Login attempt [username: fakeuser, password: fakepassword] from 192.168.137.78
+2025-04-01 06:43:31,622 - HTTP Request: POST https://api.telegram.org/bot7731626441:AAFoUs4f7h_QeIexuccDh4ZeBI42CGMsiOo/sendMessage "HTTP/1.1 200 OK"
+2025-04-01 06:50:07,267 - Login attempt [username: fakeuser, password: fakepassword] from 192.168.137.78
+2025-04-01 06:50:08,156 - HTTP Request: POST https://api.telegram.org/bot7731626441:AAFoUs4f7h_QeIexuccDh4ZeBI42CGMsiOo/sendMessage "HTTP/1.1 200 OK"
+2025-04-01 06:52:08,470 - Login attempt [username: fakeuser, password: fakepassword] from 192.168.137.78
+2025-04-01 06:52:09,307 - HTTP Request: POST https://api.telegram.org/bot7731626441:AAFoUs4f7h_QeIexuccDh4ZeBI42CGMsiOo/sendMessage "HTTP/1.1 200 OK"
+2025-04-01 06:55:21,158 - ❌ FAILED Login Attempt [User: `fakeuser1`, Password: `wrongpass`] from `192.168.137.78`
+2025-04-01 06:55:22,095 - HTTP Request: POST https://api.telegram.org/bot7731626441:AAFoUs4f7h_QeIexuccDh4ZeBI42CGMsiOo/sendMessage "HTTP/1.1 200 OK"
+2025-04-01 06:55:24,101 - ❌ FAILED Login Attempt [User: `fakeuser2`, Password: `123456`] from `192.168.137.78`
+2025-04-01 06:55:24,108 - Error sending alert: Unknown error in HTTP implementation: RuntimeError('Event loop is closed')
+2025-04-01 06:55:26,109 - ❌ FAILED Login Attempt [User: `admin`, Password: `admin123`] from `192.168.137.78`
+2025-04-01 06:55:26,946 - HTTP Request: POST https://api.telegram.org/bot7731626441:AAFoUs4f7h_QeIexuccDh4ZeBI42CGMsiOo/sendMessage "HTTP/1.1 200 OK"
+2025-04-01 06:55:26,960 - Error sending alert: Unknown error in HTTP implementation: RuntimeError('Event loop is closed')
+2025-04-01 06:55:28,963 - ❌ FAILED Login Attempt [User: `root`, Password: `toor`] from `192.168.137.78`
+2025-04-01 06:55:29,785 - HTTP Request: POST https://api.telegram.org/bot7731626441:AAFoUs4f7h_QeIexuccDh4ZeBI42CGMsiOo/sendMessage "HTTP/1.1 200 OK"
+2025-04-01 06:55:29,800 - Error sending alert: Unknown error in HTTP implementation: RuntimeError('Event loop is closed')
