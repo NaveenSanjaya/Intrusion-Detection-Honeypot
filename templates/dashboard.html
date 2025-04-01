@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intrusion Analytics Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <header>
+        <h1>Intrusion Analytics Dashboard 🕵️‍♂️</h1>
+    </header>
+
+    <main>
+        <section class="search">
+            <form action="/search" method="POST">
+                <input type="text" name="query" placeholder="Search by IP Address">
+                <button type="submit">Search</button>
+            </form>
+        </section>
+
+        <section class="stats">
+            <div class="card">
+                <h2>Login Attempts</h2>
+                <table id="loginAttemptsTable">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Password</th>
+                            <th>IP Address</th>
+                            <th>Timestamp</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data will be populated here by AJAX -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card">
+                <h2>Blocked IPs</h2>
+                <table id="blockedIpsTable">
+                    <thead>
+                        <tr>
+                            <th>IP Address</th>
+                            <th>Blocked Since</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data will be populated here by AJAX -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card">
+                <h2>Login Attempts Over Time</h2>
+                <canvas id="loginAttemptsChart"></canvas>
+            </div>
+
+            <div class="card">
+                <h2>Blocked IPs Over Time</h2>
+                <canvas id="blockedIpsChart"></canvas>
+            </div>
+
+            <div class="card">
+                <button id="exportBtn">Export Data to CSV</button>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Fetch and update login attempts every 5 seconds
+        function fetchLoginAttempts() {
+            $.get('/api/login_attempts', function(data) {
+                let html = '';
+                data.forEach(function(attempt) {
+                    html += `<tr>
+                        <td>${attempt.username}</td>
+                        <td>${attempt.password}</td>
+                        <td>${attempt.src_ip}</td>
+                        <td>${attempt.timestamp}</td>
+                        <td>${attempt.status}</td>
+                    </tr>`;
+                });
+                $('#loginAttemptsTable tbody').html(html);
+            });
+        }
+
+        // Fetch and update blocked IPs every 5 seconds
+        function fetchBlockedIps() {
+            $.get('/api/blocked_ips', function(data) {
+                let html = '';
+                data.forEach(function(ip) {
+                    html += `<tr>
+                        <td>${ip.ip_address}</td>
+                        <td>${ip.blocked_timestamp}</td>
+                    </tr>`;
+                });
+                $('#blockedIpsTable tbody').html(html);
+            });
+        }
+
+        // Render Charts
+        function renderCharts() {
+            $.get('/api/login_attempts', function(data) {
+                let times = data.map(attempt => attempt.timestamp);  // Timestamps
+                let attempts = data.map(attempt => attempt.username); // Usernames
+
+                const loginAttemptsCtx = document.getElementById('loginAttemptsChart').getContext('2d');
+                new Chart(loginAttemptsCtx, {
+                    type: 'line',
+                    data: {
+                        labels: times,
+                        datasets: [{
+                            label: 'Login Attempts',
+                            data: attempts,
+                            borderColor: '#00FF00',
+                            backgroundColor: 'rgba(0, 255, 0, 0.2)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            x: { type: 'linear', position: 'bottom' },
+                            y: { beginAtZero: true }
+                        }
+                    }
+                });
+            });
+
+            $.get('/api/blocked_ips', function(data) {
+                let times = data.map(ip => ip.blocked_timestamp);  // Blocked times
+                let ips = data.map(ip => ip.ip_address); // IPs
+
+                const blockedIpsCtx = document.getElementById('blockedIpsChart').getContext('2d');
+                new Chart(blockedIpsCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ips,
+                        datasets: [{
+                            label: 'Blocked IPs',
+                            data: new Array(ips.length).fill(1), // All bars have value 1 (blocked event)
+                            backgroundColor: '#FF0000',
+                            borderColor: '#FF0000',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: { 
+                                ticks: { maxRotation: 45, minRotation: 0 },
+                            },
+                        }
+                    }
+                });
+            });
+        }
+
+        // Call functions on page load
+        $(document).ready(function() {
+            fetchLoginAttempts();
+            fetchBlockedIps();
+            renderCharts();
+
+            // Refresh data every 5 seconds
+            setInterval(function() {
+                fetchLoginAttempts();
+                fetchBlockedIps();
+            }, 5000);
+
+            // Export data to CSV
+            $('#exportBtn').click(function() {
+                window.location.href = '/export_data';
+            });
+        });
+    </script>
+
+</body>
+</html>

@@ -1,87 +1,107 @@
 import logging
 import asyncio
-import time
-from collections import defaultdict
-from logging.handlers import RotatingFileHandler
+import subprocess
+import sqlite3
 from telegram import Bot
 from telegram.error import TelegramError
+
+# Set up logging
+logging.basicConfig(filename='login_attempts.log', level=logging.INFO, format='%(asctime)s - %(message)s')
+blocked_ips_log = 'blocked_ips.log'
+DB_PATH = 'intrusion_data.db'
 
 # Telegram Bot setup
 TELEGRAM_API_KEY = '7731626441:AAFoUs4f7h_QeIexuccDh4ZeBI42CGMsiOo'
 CHAT_ID = '1358202646'
 bot = Bot(token=TELEGRAM_API_KEY)
 
-# Configure logging with rotation
-log_file = 'login_attempts.log'
-handler = RotatingFileHandler(log_file, maxBytes=5000000, backupCount=5)
-logging.basicConfig(
-    handlers=[handler],
-    level=logging.INFO,
-    format="%(asctime)s - %(message)s"
-)
+# Track failed attempts per IP
+failed_attempts = {}
+BLOCK_THRESHOLD = 3  # Block IP after 3 failed attempts
 
-# Track failed login attempts per IP
-failed_attempts = defaultdict(list)
-FAILED_THRESHOLD = 3  # Trigger alert after 3 failed attempts
-TIME_WINDOW = 300  # 5-minute window
+# Initialize SQLite Database
+def initialize_db():
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute('''CREATE TABLE IF NOT EXISTS login_attempts (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        username TEXT,
+                        password TEXT,
+                        ip_address TEXT,
+                        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+                      )''')
+    cursor.execute('''CREATE TABLE IF NOT EXISTS blocked_ips (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        ip_address TEXT UNIQUE,
+                        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+                      )''')
+    conn.commit()
+    conn.close()
 
 async def send_telegram_alert(message):
-    """Send an alert message via Telegram."""
+    """Send an alert via Telegram."""
     try:
-        await bot.send_message(chat_id=CHAT_ID, text=message, parse_mode="Markdown")
+        await bot.send_message(chat_id=CHAT_ID, text=message, parse_mode="HTML")
     except TelegramError as e:
         logging.error(f"Error sending alert: {e}")
 
-def log_login_attempt(username, password, src_ip, success=False):
-    """Log login attempts and trigger alerts on repeated failures."""
-    status = "✅ SUCCESS" if success else "❌ FAILED"
-    log_message = f"{status} Login Attempt [User: `{username}`, Password: `{password}`] from `{src_ip}`"
-    
-    # Log to file
+def block_ip(ip_address):
+    """Block an IP using UFW (or iptables as fallback)."""
+    try:
+        subprocess.run(["sudo", "ufw", "deny", "from", ip_address, "to", "any"], check=True)
+    except subprocess.CalledProcessError:
+        subprocess.run(["sudo", "iptables", "-A", "INPUT", "-s", ip_address, "-j", "DROP"], check=True)
+    log_blocked_ip(ip_address)
+
+# Update log_login_attempt to include 'status' column
+def log_login_attempt(username, password, src_ip):
+    """Log login attempts into file and database."""
+    log_message = f"\U0001F510 Login attempt [Username: {username}, Password: {password}] from IP {src_ip}"
     logging.info(log_message)
-
-    # If failed, track the attempt
-    if not success:
-        track_failed_attempt(src_ip)
-
-    # Send a Telegram alert for all attempts (optional, remove if you only want alerts for failures)
-    asyncio.run(send_telegram_alert(log_message))
-
-def track_failed_attempt(ip_address):
-    """Track failed login attempts and trigger an alert if the threshold is exceeded."""
-    current_time = time.time()
     
-    # Store the attempt timestamp
-    failed_attempts[ip_address].append(current_time)
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    status = "failed"  # Default status for failed attempts
+    cursor.execute("INSERT INTO login_attempts (username, password, ip_address, status) VALUES (?, ?, ?, ?)", 
+                   (username, password, src_ip, status))
+    conn.commit()
+    conn.close()
+    
+    failed_attempts[src_ip] = failed_attempts.get(src_ip, 0) + 1
+    
+    if failed_attempts[src_ip] >= BLOCK_THRESHOLD:
+        block_ip(src_ip)
+    else:
+        message = f"\U0001F6A8 <b>Failed Login Attempt</b>\n👤 <b>Username:</b> <code>{username}</code>\n🔑 <b>Password:</b> <code>{password}</code>\n🌐 <b>IP:</b> <code>{src_ip}</code>\n⚠️ Attempts: {failed_attempts[src_ip]}/{BLOCK_THRESHOLD}"
+        asyncio.run(send_telegram_alert(message))
 
-    # Keep only attempts within the last TIME_WINDOW (5 minutes)
-    failed_attempts[ip_address] = [t for t in failed_attempts[ip_address] if current_time - t < TIME_WINDOW]
+# Update log_blocked_ip to use 'blocked_timestamp'
+def log_blocked_ip(ip_address):
+    """Log blocked IPs into file and database."""
+    with open(blocked_ips_log, 'a') as f:
+        f.write(f"{ip_address} - Blocked\n")
+    
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("INSERT OR IGNORE INTO blocked_ips (ip_address) VALUES (?)", (ip_address,))
+    conn.commit()
+    conn.close()
+    
+    message = f"\U0001F6A8 <b>ALERT!</b>\n\U0001F534 IP <code>{ip_address}</code> has been <b>BLOCKED</b> after multiple failed login attempts!"
+    asyncio.run(send_telegram_alert(message))
 
-    # If threshold exceeded, send an alert
-    if len(failed_attempts[ip_address]) >= FAILED_THRESHOLD:
-        alert_message = (
-            f"🚨 *Repeated Failed Login Attempts Detected!* 🚨\n\n"
-            f"📍 *IP Address:* `{ip_address}`\n"
-            f"❌ *Failed Attempts:* `{len(failed_attempts[ip_address])}`\n"
-            f"⏳ *Time Window:* Last {TIME_WINDOW//60} minutes\n\n"
-            f"⚠️ Consider blocking this IP!"
-        )
-        asyncio.run(send_telegram_alert(alert_message))
-
-# Simulate login attempts
+# Simulate an intruder login attempt
 def simulate_intruder():
-    """Simulates an intruder with multiple login attempts."""
-    attempts = [
-        ("fakeuser1", "wrongpass", "192.168.137.78"),
-        ("fakeuser2", "123456", "192.168.137.78"),
-        ("admin", "admin123", "192.168.137.78"),
-        ("root", "toor", "192.168.137.78"),  # This will trigger the alert
-    ]
+    username = "fakeuser"
+    password = "fakepassword"
+    src_ip = "192.168.137.78"
+    log_login_attempt(username, password, src_ip)
 
-    for username, password, src_ip in attempts:
-        log_login_attempt(username, password, src_ip, success=False)
-        time.sleep(2)  # Simulating a time gap between login attempts
+# Initialize database on script start
+initialize_db()
 
 # Call simulate_intruder to test
 if __name__ == "__main__":
+    simulate_intruder()
+    simulate_intruder()
     simulate_intruder()
