@@ -1,102 +1,122 @@
-# Intrusion Detection Honeypot
+# 🛡️ Intrusion Detection & Honeypot System with Analytics Dashboard
 
-The **Intrusion Detection Honeypot** is a security-focused application designed to monitor and log unauthorized login attempts, block malicious IPs, and provide real-time analytics through a web-based dashboard. It integrates with Telegram for instant alerts and supports exporting data for further analysis.
+A lightweight Intrusion Detection System (IDS) and Honeypot built using Python and Flask. This project logs unauthorized login attempts, blocks suspicious IPs, and provides a modern web dashboard for intrusion analytics. It optionally sends real-time alerts via Telegram.
 
----
+## 🔧 Features
 
-## Features
-
-- **Real-Time Monitoring**: Tracks login attempts and blocked IPs.
-- **IP Blocking**: Automatically blocks IPs after a configurable number of failed login attempts.
-- **Web Dashboard**: Displays login attempts and blocked IPs with dynamic charts and tables.
-- **Telegram Alerts**: Sends instant alerts for failed login attempts and blocked IPs.
-- **Data Export**: Allows exporting login and blocked IP data as a CSV file.
-- **Customizable Thresholds**: Configure the number of failed attempts before blocking an IP.
+- 🔐 **Login Honeypot** – Captures all login attempts.
+- 📊 **Analytics Dashboard** – View recent login attempts and blocked IPs via a clean UI.
+- 📁 **SQLite Logging** – Stores login and blocking activity locally.
+- 🚫 **IP Blocking** – Automatically blocks brute-force attempts.
+- 📱 **Telegram Alerts** – Optional notifications for login attempts.
 
 ---
 
-## Prerequisites
+## 📂 Project Structure
 
-Before setting up the project, ensure you have the following installed:
+Intrusion-Detection-Honeypot/ ├── app.py # Flask backend ├── database_setup.py # DB schema setup script ├── intrusion_log.py # Logs login attempts ├── static/ │ └── styles.css # Dashboard styling ├── templates/ │ └── index.html # Dashboard frontend ├── intrusion_data.db # SQLite DB (created at runtime) ├── config.py # Telegram config (optional) └── README.md
 
-- Python 3.8 or higher
-- SQLite (pre-installed with Python)
-- Flask
-- Chart.js (for dynamic charts)
-- jQuery
-- UFW or iptables (for IP blocking)
-- Telegram Bot API Key and Chat ID
+yaml
+Copy
+Edit
 
 ---
 
-## Installation
+## 🚀 Getting Started
 
-1. **Clone the Repository**:
-   ```bash
-   git clone https://github.com/your-username/Intrusion-Detection-Honeypot.git
-   cd Intrusion-Detection-Honeypot
+### 1. Clone the Repository
 
-Install Dependencies: Install the required Python packages:
+```bash
+git clone https://github.com/yourusername/Intrusion-Detection-Honeypot.git
+cd Intrusion-Detection-Honeypot
+2. Create a Virtual Environment
+bash
+Copy
+Edit
+python3 -m venv .venv
+source .venv/bin/activate   # On Windows: .venv\Scripts\activate
+3. Install Dependencies
+bash
+Copy
+Edit
+pip install -r requirements.txt
+4. Setup the Database
+bash
+Copy
+Edit
+python database_setup.py
+This script creates:
 
-Set Up the Database: Initialize the SQLite database:
+login_attempts table
 
-Configure Telegram Bot: Update the TELEGRAM_API_KEY and CHAT_ID in login_alert.py with your Telegram Bot API key and chat ID.
+blocked_ips table
 
-Usage
-Start the Flask Application: Run the Flask app to start the web dashboard:
+5. Run the Flask App
+bash
+Copy
+Edit
+python app.py
+Open your browser and visit:
+📍 http://127.0.0.1:5000
 
-Simulate Intrusions: Use the test_system.py script to simulate login attempts and blocked IPs:
+🛠️ Simulate Intruder Activity
+Use the following command or a script to simulate login attempts:
 
-Access the Dashboard: Open your browser and navigate to:
+bash
+Copy
+Edit
+python intrusion_log.py --username test --password wrongpass --ip 192.168.1.100
+🔔 Optional: Telegram Alerts
+To enable Telegram alerts:
 
-Export Data: Click the "Export Data to CSV" button on the dashboard to download the data.
+Get your Telegram bot token from BotFather.
 
-Configuration
-Telegram Bot Setup
-Create a Telegram bot using BotFather.
-Obtain the API key and update the following variables in login_alert.py:
-Blocking Threshold
-Modify the BLOCK_THRESHOLD in login_alert.py to change the number of failed attempts before blocking an IP:
+Get your chat ID from @userinfobot.
 
-File Structure
-API Endpoints
-The application provides the following API endpoints:
+Create a config.py file:
 
-Login Attempts:
+python
+Copy
+Edit
+TELEGRAM_BOT_TOKEN = 'your_bot_token_here'
+TELEGRAM_CHAT_ID = 'your_chat_id_here'
+The app will automatically send messages on new login attempts.
 
-Returns the latest login attempts in JSON format.
+📊 Dashboard Preview
+Recent Login Attempts (username, IP, time, status)
 
-Blocked IPs:
+Blocked IPs (with timestamps)
 
-Returns the list of blocked IPs in JSON format.
+Auto-refreshing via AJAX
 
-Export Data:
+<!-- You can add a screenshot of your dashboard here --> <!-- ![Dashboard Screenshot](https://your-screenshot-link.com/dashboard.png) -->
+⚙️ API Endpoints
+Endpoint	Method	Description
+/api/login_attempts	GET	Returns last 10 login attempts
+/api/blocked_ips	GET	Returns last 10 blocked IPs
+🧠 Future Enhancements
+Add geolocation using IP
 
-Exports login attempts and blocked IPs as a CSV file.
+Email alert support
 
-Security Considerations
-Telegram API Key: Do not expose your Telegram API key in public repositories. Use environment variables or a .env file to store sensitive information.
-IP Blocking: Ensure UFW or iptables is properly configured and running on your system.
-Database Security: Protect the intrusion_data.db file from unauthorized access.
-Troubleshooting
-Charts Not Updating:
+Admin login and panel
 
-Ensure the /api/login_attempts and /api/blocked_ips endpoints are returning valid data.
-Check the JavaScript console for errors.
-Telegram Alerts Not Working:
+Brute-force threshold customization
 
-Verify the TELEGRAM_API_KEY and CHAT_ID are correct.
-Check the Telegram bot permissions.
-Database Issues:
+🤝 Contributing
+Pull requests are welcome! If you have suggestions or want to enhance the dashboard or detection mechanism, feel free to fork the project.
 
-Ensure the intrusion_data.db file exists and is initialized using db.py.
-License
-This project is licensed under the MIT License. See the LICENSE file for details.
+📜 License
+MIT License – feel free to use and modify for your projects!
 
-Acknowledgments
-Flask for the web framework.
-Chart.js for dynamic charts.
-Telegram Bot API for instant alerts.
-Disclaimer
-This project is for educational purposes only. Use it responsibly and ensure compliance with local laws and regulations.
+👤 Author
+Naveen
+📫 Email me | 🌐 Portfolio
 
+python
+Copy
+Edit
+
+---
+
+Let me know if you'd like the `requirements.txt` content too or if you're preparing this for submission and need a polished zipped bundle!
